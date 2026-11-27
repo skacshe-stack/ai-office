@@ -553,7 +553,7 @@
 
     if (sender.kind === "human") {
       var targets = parseMentioned(text);
-      targets = targets.slice(0, 3);
+      targets = targets.slice(0, 4);
       if (targets.length) {
         targets.forEach(function (m, i) {
           setTimeout(function () { respondAs(m, topic, text); }, 420 + i * 260);
@@ -918,9 +918,10 @@
 
       return Promise.all([topicsReq, msgReq]).then(function (res) {
         var serverTopics = res[0], serverMsgs = res[1];
+        var before = dataSignature();
         if (serverTopics) mergeTopics(serverTopics);
         if (serverMsgs) mergeMessages(serverMsgs);
-        renderTopics(); renderChat();
+        if (dataSignature() !== before) { renderTopics(); renderChat(); }
       });
     },
 
@@ -933,6 +934,12 @@
       });
     }
   };
+
+  function dataSignature() {
+    var t = state.topics.map(function (x) { return x.id + ":" + (x.updatedAt || x.createdAt) + ":" + x.status; }).join("|");
+    var m = state.messages.map(function (x) { return x.id; }).join(",");
+    return state.topics.length + "/" + t + "/" + m;
+  }
 
   function mergeTopics(server) {
     var serverIds = {};
@@ -1239,6 +1246,7 @@
     // 입력
     var input = $("#input");
     input.addEventListener("keydown", function (e) {
+      if (e.isComposing || e.keyCode === 229) return;
       if (!document.getElementById("mentionPop").hidden) {
         if (e.key === "ArrowDown") { e.preventDefault(); ui.mentionIndex = (ui.mentionIndex + 1) % ui.mentionMatches.length; showMention(currentMentionQuery() ? currentMentionQuery().q : ""); return; }
         if (e.key === "ArrowUp") { e.preventDefault(); ui.mentionIndex = (ui.mentionIndex - 1 + ui.mentionMatches.length) % ui.mentionMatches.length; showMention(currentMentionQuery() ? currentMentionQuery().q : ""); return; }
