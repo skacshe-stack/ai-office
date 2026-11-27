@@ -10,6 +10,16 @@
 
 > 이 저장소에는 어떤 API 키도 들어 있지 않습니다. 모든 설정은 사용하는 사람의 브라우저에서만 입력·보관됩니다.
 
+### 미리보기
+
+| PC | 휴대폰 |
+|---|---|
+| ![PC 화면](./screenshots/01-desktop.png) | ![휴대폰 화면](./screenshots/05-mobile.png) |
+
+| 설정 (Firebase·AI 키·브릿지) | 다크 테마 |
+|---|---|
+| ![설정](./screenshots/03-settings.png) | ![다크](./screenshots/04-dark.png) |
+
 ---
 
 ## 1. 바로 쓰기
@@ -151,7 +161,8 @@ ai-office/
 ├─ CLOUDFLARE_SETUP.md   Worker 5분 설정 가이드
 ├─ manifest.json         PWA 매니페스트
 ├─ sw.js                 서비스 워커 (앱 셸 캐시)
-└─ assets/icons/         PWA · 파비콘 아이콘
+├─ assets/icons/         PWA · 파비콘 아이콘
+└─ screenshots/          README 미리보기 캡처
 ```
 
 ---
