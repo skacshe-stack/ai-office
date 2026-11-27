@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>도유니 AI 오피스</title>
+<meta name="description" content="도유니 AI 오피스 — 나와 AI 에이전트(피클·ChatGPT·Claude·Gemini)가 한 화면에서 안건을 열고 이야기하는 회의실" />
+<meta name="theme-color" content="#f5f7f6" />
+<meta name="color-scheme" content="light dark" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="도유니 AI 오피스" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<link rel="manifest" href="./manifest.json" />
+<link rel="icon" type="image/png" sizes="32x32" href="./assets/icons/favicon-32.png" />
+<link rel="apple-touch-icon" href="./assets/icons/icon-192.png" />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── 상단 바 ─────────────────────────────────────── -->
+  <header class="topbar">
+    <button class="icon-btn only-mobile" id="drawerBtn" type="button" aria-label="안건 목록 열기" aria-expanded="false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+    </button>
+
+    <div class="brand">
+      <div class="logo" aria-hidden="true">도</div>
+      <div class="brand-text">
+        <h1><span class="brand-prefix">도유니 </span>AI 오피스</h1>
+        <p id="brandSub">나와 AI 에이전트가 함께 쓰는 회의실</p>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button class="mode-badge" id="modeBadge" type="button" title="연결 상태 · 눌러서 설정 열기">
+        <i class="dot" aria-hidden="true"></i><span id="modeText">로컬 모드</span>
+      </button>
+      <button class="icon-btn" id="settingsBtn" type="button" aria-label="설정">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" /><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.11a1.7 1.7 0 0 0-1.11-1.56 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.7 1.7 0 0 0 .34-1.87 1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.11a1.7 1.7 0 0 0 1.56-1.11 1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9a1.7 1.7 0 0 0 1.03-1.56V3a2 2 0 1 1 4 0v.11a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V9c.23.42.61.74 1.06.87H21a2 2 0 1 1 0 4h-.11a1.7 1.7 0 0 0-1.49 1.13Z" /></svg>
+      </button>
+      <button class="icon-btn" id="themeBtn" type="button" aria-label="라이트·다크 테마 전환" title="테마 전환">
+        <svg viewBox="0 0 24 24" aria-hidden="true" id="themeIcon"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6" /></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ── 작업 영역 ───────────────────────────────────── -->
+  <div class="workspace">
+
+    <aside class="sidebar" id="sidebar" aria-label="방과 안건">
+      <nav class="rooms" id="rooms" aria-label="회의실 선택"></nav>
+
+      <div class="topic-head">
+        <h2>안건 <span class="count" id="topicCount">0</span></h2>
+        <button class="btn ghost small" id="newTopicBtn" type="button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" /></svg>새 안건
+        </button>
+      </div>
+
+      <div class="topic-list" id="topicList"></div>
+
+      <div class="sidebar-foot">
+        <div class="me-row">
+          <span class="avatar me" id="myAvatar">도</span>
+          <div class="me-text">
+            <strong id="myName">도유니</strong>
+            <span id="myHandle">@bangdoyuni1</span>
+          </div>
+        </div>
+        <button class="link-btn" id="openSettingsLink" type="button">연결 · 설정</button>
+      </div>
+    </aside>
+
+    <div class="scrim" id="scrim" hidden></div>
+
+    <main class="stage">
+      <section class="chat" aria-label="대화">
+        <header class="chat-head" id="chatHead"></header>
+
+        <div class="chat-scroll" id="chatScroll">
+          <div class="messages" id="messages" aria-live="polite"></div>
+        </div>
+
+        <div class="composer-wrap">
+          <div class="mention-pop" id="mentionPop" hidden></div>
+          <div class="typing" id="typing" hidden>
+            <span class="typing-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span id="typingText">답변 작성 중…</span>
+          </div>
+
+          <div class="chips" id="chips"></div>
+
+          <form class="composer" id="composer" autocomplete="off">
+            <div class="sender-pick">
+              <button class="sender-btn" id="senderBtn" type="button" aria-haspopup="listbox" aria-expanded="false">
+                <span class="avatar tiny" id="senderAvatar">도</span>
+                <span id="senderLabel">도유니</span>
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+              </button>
+              <div class="sender-menu" id="senderMenu" role="listbox" hidden></div>
+            </div>
+
+            <textarea id="input" rows="1" placeholder="안건에 대해 이야기하거나 @피클 처럼 불러 보세요" aria-label="메시지 입력"></textarea>
+
+            <button class="send-btn" id="sendBtn" type="submit" aria-label="보내기">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12 20 4.5 14.5 20 11 13.5 4.5 12Z" /></svg>
+            </button>
+          </form>
+          <p class="composer-note" id="composerNote"></p>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- ── 안건 만들기/수정 모달 ──────────────────────────── -->
+<dialog class="sheet" id="topicDialog">
+  <form method="dialog" class="sheet-inner" id="topicForm">
+    <header class="sheet-head">
+      <h2 id="topicDialogTitle">새 안건</h2>
+      <button class="icon-btn" value="cancel" type="submit" aria-label="닫기">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </header>
+    <div class="sheet-body">
+      <label class="field">
+        <span>안건 제목</span>
+        <input id="topicTitle" type="text" maxlength="80" placeholder="예: AI 오피스 오픈 준비" required />
+      </label>
+      <label class="field">
+        <span>설명 <em>선택</em></span>
+        <textarea id="topicDesc" rows="3" maxlength="300" placeholder="이 안건에서 정하려는 것, 참고할 내용을 적어 두세요"></textarea>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>회의실</span>
+          <select id="topicRoom"></select>
+        </label>
+        <label class="field">
+          <span>상태</span>
+          <select id="topicStatus">
+            <option value="open">진행 중</option>
+            <option value="hold">보류</option>
+            <option value="done">완료</option>
+          </select>
+        </label>
+      </div>
+    </div>
+    <footer class="sheet-foot">
+      <button class="btn danger" id="topicDeleteBtn" type="button" hidden>안건 삭제</button>
+      <span style="flex:1"></span>
+      <button class="btn ghost" value="cancel" type="submit">취소</button>
+      <button class="btn primary" id="topicSaveBtn" value="save" type="submit">저장</button>
+    </footer>
+  </form>
+</dialog>
+
+<!-- ── 설정 모달 ──────────────────────────────────────── -->
+<dialog class="sheet wide" id="settingsDialog">
+  <div class="sheet-inner">
+    <header class="sheet-head">
+      <h2>연결 · 설정</h2>
+      <button class="icon-btn" id="settingsClose" type="button" aria-label="닫기">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      </button>
+    </header>
+
+    <div class="tabs" role="tablist" aria-label="설정 항목">
+      <button class="tab active" data-tab="status" role="tab" type="button">상태</button>
+      <button class="tab" data-tab="ai" role="tab" type="button">AI 답변</button>
+      <button class="tab" data-tab="firebase" role="tab" type="button">Firebase</button>
+      <button class="tab" data-tab="bridge" role="tab" type="button">브릿지</button>
+      <button class="tab" data-tab="data" role="tab" type="button">데이터</button>
+    </div>
+
+    <div class="sheet-body">
+
+      <!-- 상태 -->
+      <section class="panel active" data-panel="status">
+        <div class="status-cards">
+          <div class="status-card">
+            <span class="status-k">지금 모드</span>
+            <strong id="stMode">로컬 모드</strong>
+            <p id="stModeDesc">이 브라우저에만 저장됩니다. 설정 없이 바로 동작합니다.</p>
+          </div>
+          <div class="status-card">
+            <span class="status-k">AI 답변</span>
+            <strong id="stAI">시뮬레이션</strong>
+            <p id="stAIDesc">@멘션에 예시 답변이 달립니다.</p>
+          </div>
+          <div class="status-card">
+            <span class="status-k">동기화</span>
+            <strong id="stSync">이 기기만</strong>
+            <p id="stSyncDesc">Firebase를 연결하면 다른 기기와 같은 대화를 봅니다.</p>
+          </div>
+        </div>
+        <ul class="checklist" id="checklist"></ul>
+        <p class="hint">모든 설정값은 이 브라우저의 <code>localStorage</code>에만 저장되고 서버로 보내지 않습니다.</p>
+      </section>
+
+      <!-- AI 답변 -->
+      <section class="panel" data-panel="ai">
+        <h3 class="panel-title">AI별 API 키 <span class="tag">BYOK</span></h3>
+        <p class="hint">키를 넣은 AI만 실제 답변을 합니다. 넣지 않은 AI는 예시(시뮬레이션) 답변으로 동작합니다.</p>
+
+        <div class="key-list" id="keyList"></div>
+
+        <label class="check">
+          <input type="checkbox" id="useLiveAI" />
+          <span>실제 AI 답변 사용 <em>키가 있는 AI에 한해 브라우저에서 직접 호출</em></span>
+        </label>
+
+        <div class="notice warn">
+          <strong>키 보관 주의</strong>
+          <p>브라우저에 넣은 키는 이 기기에서만 쓰입니다. 공용 PC에서는 쓰지 말고, 노출이 걱정되면 아래 <b>브릿지</b> 탭의 Cloudflare Worker 방식을 권장합니다.</p>
+        </div>
+
+        <div class="row-actions">
+          <button class="btn ghost" id="aiResetBtn" type="button">키 모두 지우기</button>
+          <button class="btn primary" id="aiSaveBtn" type="button">저장</button>
+        </div>
+      </section>
+
+      <!-- Firebase -->
+      <section class="panel" data-panel="firebase">
+        <h3 class="panel-title">Firebase Firestore <span class="tag">여러 기기 동기화</span></h3>
+        <p class="hint">Firebase 콘솔 → 프로젝트 설정 → 내 앱(웹)에서 <code>firebaseConfig</code>를 복사해 붙여넣으세요. 3초 안에 연결되어 안건과 대화가 실시간으로 동기화됩니다.</p>
+        <label class="field">
+          <span>firebaseConfig (JSON)</span>
+          <textarea id="fbConfig" rows="7" spellcheck="false" placeholder='{
+  "apiKey": "AIza...",
+  "authDomain": "내프로젝트.firebaseapp.com",
+  "projectId": "내프로젝트",
+  "storageBucket": "내프로젝트.appspot.com",
+  "messagingSenderId": "000000000000",
+  "appId": "1:000000000000:web:abcdef"
+}'></textarea>
+        </label>
+        <p class="hint small">컬렉션: <code>aiOfficeTopics</code>, <code>aiOfficeMessages</code> · Firestore 규칙은 README의 예시를 참고하세요.</p>
+        <div class="row-actions">
+          <button class="btn ghost" id="fbDisconnectBtn" type="button">연결 해제</button>
+          <button class="btn" id="fbTestBtn" type="button">연결 확인</button>
+          <button class="btn primary" id="fbSaveBtn" type="button">저장 · 연결</button>
+        </div>
+        <div class="row-actions left" style="margin-top:10px">
+          <button class="btn ghost" id="fbPushAllBtn" type="button">이 기기의 안건·대화 올리기</button>
+        </div>
+        <p class="result" id="fbResult" hidden></p>
+      </section>
+
+      <!-- 브릿지 -->
+      <section class="panel" data-panel="bridge">
+        <h3 class="panel-title">Cloudflare Worker 브릿지 <span class="tag">키를 서버에 두기</span></h3>
+        <p class="hint">Worker 주소를 넣으면 API 키가 브라우저에 없어도 AI가 답합니다. 저장소에 들어 있는 <code>cloudflare-worker.js</code>와 <code>CLOUDFLARE_SETUP.md</code>를 참고해 5분이면 배포됩니다.</p>
+        <label class="field">
+          <span>Worker 주소</span>
+          <input id="bridgeUrl" type="url" spellcheck="false" placeholder="https://doyuni-ai-office.내계정.workers.dev" />
+        </label>
+        <label class="field">
+          <span>공유 토큰 <em>선택</em></span>
+          <input id="bridgeToken" type="text" spellcheck="false" placeholder="Worker에 넣은 OFFICE_TOKEN 값" />
+        </label>
+        <div class="row-actions">
+          <button class="btn ghost" id="bridgeClearBtn" type="button">지우기</button>
+          <button class="btn" id="bridgeTestBtn" type="button">연결 확인</button>
+          <button class="btn primary" id="bridgeSaveBtn" type="button">저장</button>
+        </div>
+        <p class="result" id="bridgeResult" hidden></p>
+      </section>
+
+      <!-- 데이터 -->
+      <section class="panel" data-panel="data">
+        <h3 class="panel-title">데이터</h3>
+        <p class="hint">안건과 대화는 이 브라우저에 저장됩니다. 백업해 두면 다른 기기로 옮길 수 있습니다.</p>
+        <div class="row-actions left">
+          <button class="btn ghost" id="exportBtn" type="button">JSON 내보내기</button>
+          <button class="btn ghost" id="importBtn" type="button">JSON 가져오기</button>
+          <input type="file" id="importFile" accept="application/json,.json" hidden />
+        </div>
+        <hr />
+        <h3 class="panel-title danger">초기화</h3>
+        <p class="hint">아래 버튼은 이 브라우저의 안건·대화를 지웁니다. 되돌릴 수 없으니 먼저 내보내기로 백업하세요.</p>
+        <div class="row-actions left">
+          <button class="btn danger" id="resetDataBtn" type="button">안건·대화 초기화</button>
+          <button class="btn ghost" id="resetAllBtn" type="button">설정까지 모두 초기화</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</dialog>
+
+<div class="toast-wrap" id="toastWrap" aria-live="polite"></div>
+
+<script src="./data.js"></script>
+<script src="./firebase-config.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

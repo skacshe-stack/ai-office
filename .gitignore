@@ -1,0 +1,14 @@
+# macOS
+.DS_Store
+
+# 편집기
+.vscode/
+.idea/
+
+# 로컬 테스트 산출물
+tests/screenshots/
+*.log
+
+# Firebase 서비스 계정 키 (절대 커밋 금지)
+serviceAccount*.json
+firebase-config.json
