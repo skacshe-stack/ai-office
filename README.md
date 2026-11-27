@@ -169,22 +169,29 @@ ai-office/
 
 ## 6. GitHub Pages 배포
 
-이미 `main` 브랜치 루트에서 Pages가 켜져 있다면, 파일을 고치고 푸시하면 1~2분 뒤 반영됩니다.
+**현재 라이브 주소**: https://skacshe-stack.github.io/ai-office/
+
+이 사이트는 Pages가 **`gh-pages` 브랜치 / (root)** 를 바라보도록 켜져 있습니다.
+(`main`을 바라보게 바꾸려면 Settings → Pages에서 소스를 바꾸면 됩니다.)
+
+그래서 파일을 고친 뒤에는 `main`과 `gh-pages` **두 곳에 푸시**해야 1~2분 뒤 사이트에 반영됩니다.
 
 ```bash
 git add -A
 git commit -m "도유니 AI 오피스 업데이트"
 git push origin main
+git push origin main:gh-pages      # 이 줄이 있어야 사이트가 갱신됩니다
 ```
 
-Pages를 새로 켜야 한다면:
+배포 스크립트를 쓰면 위 과정이 한 번에 됩니다:
 
 ```bash
-gh api -X POST repos/<owner>/ai-office/pages \
-  -f 'source[branch]=main' -f 'source[path]=/'
+bash /workspace/ai-office-deploy.sh
 ```
 
-또는 저장소 **Settings → Pages → Source: Deploy from a branch → main / (root)**.
+Pages가 꺼져 있는 새 저장소라면, `gh-pages` 브랜치를 만들면 Pages가 자동으로 켜집니다(소스: gh-pages / root).
+API로 켜려면(권한 필요): `gh api -X POST repos/<owner>/ai-office/pages -f 'source[branch]=gh-pages' -f 'source[path]=/'
+또는 **Settings → Pages → Source: Deploy from a branch → gh-pages / (root)**.
 
 ---
 
